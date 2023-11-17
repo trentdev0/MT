@@ -1,0 +1,4 @@
+/bootx64.efi
+/bootloader/*.o
+/bootloader/*.d
+/root/*
