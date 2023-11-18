@@ -1,4 +1,4 @@
-/bootx64.efi
 /bootloader/*.o
 /bootloader/*.d
-/root/*
+/root/efi/boot/BOOTX64.EFI
+/OVMF.fd

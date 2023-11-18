@@ -1,8 +1,8 @@
-#include "efi.hpp"
+#include "efi.h"
 
-uint64_t Main(EFI::Handle Handle, EFI::SystemTable * SystemTable)
+uint64_t Main(EFI_Handle Handle, EFI_SystemTable * SystemTable)
 {
-	uint16_t Message[] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!', '\0'};
+	uint16_t Message[] = L"f,mdlgjdsf/gdfGDFGdFGDFG";
 	uint64_t Status;
 
 	Status = SystemTable->Output->ClearScreen(SystemTable->Output);
