@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-typedef void * EFI_Handle;
+typedef void *EFI_Handle;
 typedef uint64_t EFI_Status;
 typedef uint64_t EFI_UnsignedInteger;
 
@@ -36,19 +36,19 @@ typedef enum
 
 typedef struct
 {
-	uint32_t data1;
-	uint16_t data2;
-	uint16_t data3;
-	uint8_t data4[8];
+	uint32_t Data0;
+	uint16_t Data1;
+	uint16_t Data2;
+	uint8_t Data3[8];
 } EFI_GUID;
 
 typedef struct
 {
-	uint32_t type;
-	uint64_t physical_start;
-	uint64_t virtual_start;
-	uint64_t pages;
-	uint64_t attributes;
+	uint32_t Type;
+	uint64_t PhysicalStart;
+	uint64_t VirtualStart;
+	uint64_t Pages;
+	uint64_t Attributes;
 } EFI_MemoryDescriptor;
 
 typedef struct
@@ -77,6 +77,60 @@ typedef struct _EFI_TextOutputStruct
 	void (*Unused6)();
 	void *Unused7;
 } EFI_TextOutput;
+
+typedef enum
+{
+	EFI_FILE_MODE_READ = 0x0000000000000001,
+	EFI_FILE_MODE_WRITE = 0x0000000000000002,
+	EFI_FILE_MODE_CREATE = 0x8000000000000000
+} EFI_FileOpenMode;
+
+typedef enum
+{
+	EFI_FILE_READ_ONLY = 0x1,
+	EFI_FILE_HIDDEN = 0x2,
+	EFI_FILE_SYSTEM = 0x4,
+	EFI_FILE_RESERVED = 0x8,
+	EFI_FILE_DIRECTORY = 0x10,
+	EFI_FILE_ARCHIVE = 0x20
+} EFI_FileAttribute;
+
+typedef struct
+{
+	uint64_t Size;
+	uint64_t FileSize;
+	uint64_t PhysicalSize;
+	EFI_Time CreateTime;
+	EFI_Time LastAccessTime;
+	EFI_Time ModificationTime;
+	uint64_t Attribute;
+	uint16_t Filename[256];
+} EFI_FileInformation;
+
+typedef struct _EFI_FileProtocol
+{
+	uint64_t Revision;
+	EFI_Status (*Open)(struct _EFI_FileProtocol *, struct _EFI_FileProtocol **, uint16_t *, uint64_t, uint64_t);
+	EFI_Status (*Close)(struct _EFI_FileProtocol *);
+
+	void (*Unused0)();
+
+	EFI_Status (*Read)(struct _EFI_FileProtocol *, uint64_t *, void *);
+
+	void (*Unused1)();
+
+	uint64_t (*GetPosition)(struct _EFI_FileProtocol *, uint64_t *);
+	uint64_t (*SetPosition)(struct _EFI_FileProtocol *, uint64_t);
+
+	uint64_t (*GetInfo)(struct _EFI_FileProtocol *, EFI_GUID *, uint64_t *, void *);
+
+	void (*Unused2)();
+	void (*Unused3)();
+	void (*Unused4)();
+	void (*Unused5)();
+	void (*Unused6)();
+	void (*Unused7)();
+} EFI_FileProtocol;
 
 typedef struct
 {
