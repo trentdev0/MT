@@ -46,21 +46,34 @@ uint64_t Main(EFI_Handle Handle, EFI_SystemTable * SystemTable)
 		goto Hang;
 	}
 
-	EFI_FileInformation KernelFileInformation;
+	DOSHeader _DOSHeader;
 
-	EFI_GUID GUID = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
-
-	uint64_t Size = sizeof(KernelFileInformation);
-	Status = KernelFile->GetInfo(KernelFile, &GUID, &Size, (void *)&KernelFileInformation);
+	Status = ReadFixed(SystemTable, KernelFile, 0, sizeof(DOSHeader), &_DOSHeader);
 	if(Status != 0)
 	{
-		SystemTable->Output->OutputString(SystemTable->Output, L"Failed to load kernel!\r\nCould not obtain file information regarding `ntoskrnl.exe`!\r\n");
+		SystemTable->Output->OutputString(SystemTable->Output, L"Failed to load kernel!\r\nCould not read DOS header from `ntoskrnl.exe`!\r\n");
 		goto Hang;
 	}
 
-	for(uint64_t i = 0; i < KernelFileInformation.PhysicalSize; i++)
+	PEHeader _PEHeader;
+
+	Status = ReadFixed(SystemTable, KernelFile, _DOSHeader.e_lfanew, sizeof(PEHeader), &_PEHeader);
+	if(Status != 0)
 	{
-		SystemTable->Output->OutputString(SystemTable->Output, L"a");
+		SystemTable->Output->OutputString(SystemTable->Output, L"Failed to load kernel!\r\nCould not read PE header from `ntoskrnl.exe`!\r\n");
+		goto Hang;
+	}
+
+	if(_DOSHeader.e_magic != 0x5A4D)
+	{
+		SystemTable->Output->OutputString(SystemTable->Output, L"Failed to load kernel!\r\nKernel does not contain a valid DOS header!\r\n");
+		goto Hang;
+	}
+
+	if(_PEHeader.mMachine != 0x8664)
+	{
+		SystemTable->Output->OutputString(SystemTable->Output, L"Failed to load kernel!\r\nKernel does not contain a valid PE header!\r\n");
+		goto Hang;
 	}
 
 Hang:

@@ -1,4 +1,5 @@
 /bootloader/*.o
 /bootloader/*.d
 /root/efi/boot/BOOTX64.EFI
+/root/efi/boot/ntoskrnl.exe
 /OVMF.fd
