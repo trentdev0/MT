@@ -6,6 +6,20 @@ typedef void *EFI_Handle;
 typedef uint64_t EFI_Status;
 typedef uint64_t EFI_UnsignedInteger;
 
+static const uint64_t MAX_BIT = 0x8000000000000000ULL;
+
+#define ERROR_CODE(status) (MAX_BIT | (status))
+
+static const EFI_Status EFI_SUCCESS = 0;
+static const EFI_Status EFI_LOAD_ERROR = ERROR_CODE(1);
+static const EFI_Status EFI_INVALID_PARAMETER = ERROR_CODE(2);
+static const EFI_Status EFI_UNSUPPORTED = ERROR_CODE(3);
+static const EFI_Status EFI_BUFFER_TOO_SMALL = ERROR_CODE(5);
+
+#define EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID {0x0964e5b22, 0x6459, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
+#define EFI_LOADED_IMAGE_PROTOCOL_GUID {0x5b1b31a1, 0x9562, 0x11d2, {0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
+#define EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL 0x00000001
+
 typedef enum
 {
 	EFI_RESERVED_MEMORY_TYPE,
@@ -50,6 +64,28 @@ typedef struct
 	uint64_t Pages;
 	uint64_t Attributes;
 } EFI_MemoryDescriptor;
+
+typedef struct
+{
+	uint8_t Type;
+	uint8_t Subtype;
+	uint16_t Length;
+} EFI_DevicePathProtocol;
+
+typedef struct
+{
+	uint16_t Year;
+	uint8_t Month;
+	uint8_t Day;
+	uint8_t Hour;
+	uint8_t Minute;
+	uint8_t Second;
+	uint8_t Unused0;
+	uint32_t Nanosecond;
+	int16_t TimeZone;
+	uint8_t Daylight;
+	uint8_t Unused1;
+} EFI_Time;
 
 typedef struct
 {
@@ -134,21 +170,6 @@ typedef struct _EFI_FileProtocol
 
 typedef struct
 {
-	uint16_t Year;
-	uint8_t Month;
-	uint8_t Day;
-	uint8_t Hour;
-	uint8_t Minute;
-	uint8_t Second;
-	uint8_t Unused0;
-	uint32_t Nanosecond;
-	int16_t TimeZone;
-	uint8_t Daylight;
-	uint8_t Unused1;
-} EFI_Time;
-
-typedef struct
-{
 	EFI_TableHeader Header;
 
 	void (*Unused0)();
@@ -224,3 +245,29 @@ typedef struct
 	uint64_t Unused7;
 	void *Unused8;
 } EFI_SystemTable;
+
+typedef struct _EFI_SimpleFilesystemProtocol
+{
+	uint64_t Revision;
+	EFI_Status (*OpenVolume)(struct _EFI_SimpleFilesystemProtocol *, EFI_FileProtocol **);
+} EFI_SimpleFilesystemProtocol;
+
+typedef struct
+{
+	uint32_t Revision;
+	EFI_Handle Parent;
+	EFI_SystemTable *system;
+
+	EFI_Handle Device;
+	EFI_DevicePathProtocol *FilePath;
+	void *Reserved;
+
+	uint32_t LoadOptionsSize;
+	void *LoadOptions;
+
+	void *ImageBase;
+	uint64_t ImageSize;
+	EFI_MemoryType ImageCodeType;
+	EFI_MemoryType ImageDataType;
+	void (*Unused)();
+} EFI_LoadedImageProtocol;
